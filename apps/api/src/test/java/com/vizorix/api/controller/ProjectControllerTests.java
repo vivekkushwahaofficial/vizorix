@@ -13,12 +13,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.vizorix.api.config.SecurityConfig;
 import com.vizorix.api.domain.enums.Language;
 import com.vizorix.api.dto.ProjectRequest;
 import com.vizorix.api.dto.ProjectResponse;
 import com.vizorix.api.exception.AccessDeniedException;
 import com.vizorix.api.exception.ResourceNotFoundException;
 import com.vizorix.api.security.CurrentUserProvider;
+import com.vizorix.api.security.CustomUserDetailsService;
+import com.vizorix.api.security.JwtAuthenticationEntryPoint;
+import com.vizorix.api.security.JwtAuthenticationFilter;
+import com.vizorix.api.security.JwtService;
 import com.vizorix.api.service.ProjectService;
 import java.time.Instant;
 import java.util.Collections;
@@ -28,13 +33,23 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-/** Controller tests for Project REST operations using MockMvc. */
+/**
+ * Controller tests for Project REST operations using MockMvc.
+ *
+ * <p>Uses {@code @WithMockUser} to simulate an authenticated Spring Security principal so that
+ * project endpoints (all of which require auth) can be reached. The {@code CurrentUserProvider}
+ * bean is mocked to return a deterministic UUID in every test.
+ */
 @WebMvcTest(ProjectController.class)
+@Import({SecurityConfig.class, JwtAuthenticationFilter.class, JwtAuthenticationEntryPoint.class})
+@WithMockUser
 class ProjectControllerTests {
 
   @Autowired private MockMvc mockMvc;
@@ -44,6 +59,11 @@ class ProjectControllerTests {
   @MockBean private ProjectService projectService;
 
   @MockBean private CurrentUserProvider currentUserProvider;
+
+  // Required by JwtAuthenticationFilter loaded via SecurityFilterChain in WebMvcTest
+  @MockBean private JwtService jwtService;
+
+  @MockBean private CustomUserDetailsService customUserDetailsService;
 
   private final UUID userId = UUID.fromString("11111111-1111-1111-1111-111111111111");
   private final UUID projectId = UUID.fromString("22222222-2222-2222-2222-222222222222");
@@ -74,7 +94,6 @@ class ProjectControllerTests {
     mockMvc
         .perform(
             post("/api/projects")
-                .header("X-User-Id", userId.toString())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
         .andExpect(status().isCreated())
@@ -94,7 +113,6 @@ class ProjectControllerTests {
     mockMvc
         .perform(
             post("/api/projects")
-                .header("X-User-Id", userId.toString())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
         .andExpect(status().isBadRequest())
@@ -103,7 +121,10 @@ class ProjectControllerTests {
         .andExpect(jsonPath("$.message").value(Matchers.containsString("sourceCode")));
   }
 
-  /** Tests that missing header credentials return HTTP 400 Bad Request. */
+  /**
+   * Tests that when the CurrentUserProvider throws an exception (e.g. no security principal), the
+   * controller returns HTTP 400 with a structured error response.
+   */
   @Test
   void testCreateProjectMissingHeader() throws Exception {
     ProjectRequest request = new ProjectRequest();
@@ -139,11 +160,7 @@ class ProjectControllerTests {
         .thenReturn(new PageImpl<>(Collections.singletonList(response)));
 
     mockMvc
-        .perform(
-            get("/api/projects")
-                .header("X-User-Id", userId.toString())
-                .param("page", "0")
-                .param("size", "20"))
+        .perform(get("/api/projects").param("page", "0").param("size", "20"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.content[0].id").value(projectId.toString()))
         .andExpect(jsonPath("$.content[0].name").value("Demo Project"));
@@ -157,7 +174,7 @@ class ProjectControllerTests {
         .thenThrow(new ResourceNotFoundException("Project not found with id: " + projectId));
 
     mockMvc
-        .perform(get("/api/projects/" + projectId).header("X-User-Id", userId.toString()))
+        .perform(get("/api/projects/" + projectId))
         .andExpect(status().isNotFound())
         .andExpect(jsonPath("$.errorCode").value("RESOURCE_NOT_FOUND"))
         .andExpect(jsonPath("$.message").value("Project not found with id: " + projectId));
@@ -173,7 +190,7 @@ class ProjectControllerTests {
                 "User do not have permission to access or modify this project resource"));
 
     mockMvc
-        .perform(get("/api/projects/" + projectId).header("X-User-Id", userId.toString()))
+        .perform(get("/api/projects/" + projectId))
         .andExpect(status().isForbidden())
         .andExpect(jsonPath("$.errorCode").value("ACCESS_DENIED"))
         .andExpect(
@@ -187,9 +204,7 @@ class ProjectControllerTests {
     when(currentUserProvider.getCurrentUserId()).thenReturn(userId);
     doNothing().when(projectService).deleteProject(eq(projectId), eq(userId));
 
-    mockMvc
-        .perform(delete("/api/projects/" + projectId).header("X-User-Id", userId.toString()))
-        .andExpect(status().isNoContent());
+    mockMvc.perform(delete("/api/projects/" + projectId)).andExpect(status().isNoContent());
 
     verify(projectService, times(1)).deleteProject(eq(projectId), eq(userId));
   }

@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -41,6 +42,46 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ErrorResponse> handleAccessDenied(
       AccessDeniedException ex, HttpServletRequest request) {
     return buildResponse(HttpStatus.FORBIDDEN, "ACCESS_DENIED", ex.getMessage(), request);
+  }
+
+  /**
+   * Intercepts UserAlreadyExistsException during registration flows.
+   *
+   * @param ex the duplicate user exception
+   * @param request the active servlet request context
+   * @return standard error response payload
+   */
+  @ExceptionHandler(UserAlreadyExistsException.class)
+  public ResponseEntity<ErrorResponse> handleUserAlreadyExists(
+      UserAlreadyExistsException ex, HttpServletRequest request) {
+    return buildResponse(HttpStatus.CONFLICT, "USER_ALREADY_EXISTS", ex.getMessage(), request);
+  }
+
+  /**
+   * Intercepts InvalidCredentialsException during login checks.
+   *
+   * @param ex the invalid credentials exception
+   * @param request the active servlet request context
+   * @return standard error response payload
+   */
+  @ExceptionHandler(InvalidCredentialsException.class)
+  public ResponseEntity<ErrorResponse> handleInvalidCredentials(
+      InvalidCredentialsException ex, HttpServletRequest request) {
+    return buildResponse(HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS", ex.getMessage(), request);
+  }
+
+  /**
+   * Intercepts Spring Security's BadCredentialsException during login verification checks.
+   *
+   * @param ex the bad credentials exception
+   * @param request the active servlet request context
+   * @return standard error response payload
+   */
+  @ExceptionHandler(BadCredentialsException.class)
+  public ResponseEntity<ErrorResponse> handleBadCredentials(
+      BadCredentialsException ex, HttpServletRequest request) {
+    return buildResponse(
+        HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS", "Invalid username or password", request);
   }
 
   /**
