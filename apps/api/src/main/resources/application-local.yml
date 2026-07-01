@@ -2,10 +2,14 @@
 # LOCAL DEVELOPMENT PROFILE - VIZORIX API
 # ==============================================================================
 
-# Default fallback environment variables for running API locally
+# Default fallback values for local development.
+# These are used when running via `./mvnw spring-boot:run` without a .env loader.
+# The .env file at the project root takes precedence when loaded by an IDE plugin.
 DB_URL: jdbc:postgresql://localhost:5432/vizorix
 DB_USERNAME: postgres
-DB_PASSWORD: postgrespassword
+DB_PASSWORD: 0105cs243d21
+
+JWT_SECRET: local-development-signing-key-minimum-32-characters-long
 
 # Development logging levels
 logging:

@@ -1,0 +1,31 @@
+# ==============================================================================
+# TEST PROFILE — VIZORIX API
+# Overrides application.yml for @SpringBootTest integration tests.
+# Provides the correct local PostgreSQL credentials without relying on
+# environment variables that are not loaded during Maven test execution.
+# ==============================================================================
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/vizorix
+    username: postgres
+    password: 0105cs243d21
+    driver-class-name: org.postgresql.Driver
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: false
+        show_sql: false
+
+vizorix:
+  security:
+    jwt:
+      secret: test-signing-key-for-unit-tests-minimum-32-characters-long
+      access-token-expiration-ms: 3600000
+      refresh-token-expiration-ms: 604800000
