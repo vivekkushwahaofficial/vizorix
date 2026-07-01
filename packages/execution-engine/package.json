@@ -1,0 +1,11 @@
+{
+  "name": "@vizorix/execution-engine",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "echo \"No build step required for execution-engine package foundation\"",
+    "dev": "echo \"No dev step required\""
+  }
+}
