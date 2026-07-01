@@ -1,0 +1,22 @@
+# ==============================================================================
+# PRODUCTION PROFILE - VIZORIX API
+# ==============================================================================
+
+# Standard database variables mapped to production environment instances
+DB_URL: ${DB_URL}
+DB_USERNAME: ${DB_USERNAME}
+DB_PASSWORD: ${DB_PASSWORD}
+
+# Disable Swagger UI and OpenAPI documentation in production
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+# Production logging levels
+logging:
+  level:
+    root: WARN
+    com.vizorix.api: INFO
+    org.flywaydb: WARN

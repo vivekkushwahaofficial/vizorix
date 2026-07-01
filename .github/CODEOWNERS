@@ -1,0 +1,21 @@
+# CODEOWNERS file for Vizorix monorepo
+# Defines team and developer ownership of workspace modules
+
+# Global default owners for all repository files
+* @vizorix-maintainers
+
+# Application specific owners
+/apps/web/ @vizorix-frontend-leads
+/apps/api/ @vizorix-backend-leads
+
+# Shared library package owners
+/packages/execution-engine/ @vizorix-execution-leads
+/packages/visualization/ @vizorix-visualization-leads
+/packages/ai/ @vizorix-ai-leads
+/packages/shared/ @vizorix-backend-leads @vizorix-frontend-leads
+/packages/ui/ @vizorix-frontend-leads
+
+# DevOps, Infrastructure, Nginx and pipelines
+/infrastructure/ @vizorix-devops-leads
+/.github/ @vizorix-devops-leads
+/docs/ @vizorix-maintainers

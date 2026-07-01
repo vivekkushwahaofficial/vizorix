@@ -1,0 +1,16 @@
+# ==============================================================================
+# LOCAL DEVELOPMENT PROFILE - VIZORIX API
+# ==============================================================================
+
+# Default fallback environment variables for running API locally
+DB_URL: jdbc:postgresql://localhost:5432/vizorix
+DB_USERNAME: postgres
+DB_PASSWORD: postgrespassword
+
+# Development logging levels
+logging:
+  level:
+    root: INFO
+    com.vizorix.api: DEBUG
+    org.flywaydb: INFO
+    org.postgresql: WARN

@@ -1,0 +1,49 @@
+{
+  "extends": [
+    "@commitlint/config-conventional"
+  ],
+  "rules": {
+    "body-max-line-length": [
+      2,
+      "always",
+      100
+    ],
+    "header-max-length": [
+      2,
+      "always",
+      72
+    ],
+    "type-enum": [
+      2,
+      "always",
+      [
+        "build",
+        "chore",
+        "docs",
+        "feat",
+        "fix",
+        "perf",
+        "refactor",
+        "revert",
+        "style",
+        "test"
+      ]
+    ],
+    "scope-enum": [
+      2,
+      "always",
+      [
+        "web",
+        "api",
+        "execution-engine",
+        "shared",
+        "visualization",
+        "ai",
+        "ui",
+        "infra",
+        "deps",
+        "release"
+      ]
+    ]
+  }
+}

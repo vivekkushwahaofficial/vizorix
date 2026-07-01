@@ -1,0 +1,47 @@
+# Ignore build, dependency, and tool-specific directories in Prettier formatting
+node_modules/
+jspm_packages/
+dist/
+build/
+out/
+.next/
+.nuxt/
+.cache/
+target/
+bin/
+
+# Temporary and log files
+*.log
+logs/
+*.tmp
+*.temp
+
+# Environments
+.env
+.env.*
+
+# IDEs
+.idea/
+.vscode/
+*.suo
+*.sln
+
+# Java compilation outputs
+.gradle/
+.settings/
+.metadata/
+*.class
+*.war
+*.ear
+*.jar
+
+# Python virtual environments
+.venv/
+venv/
+env/
+__pycache__/
+
+# Coverage outputs
+coverage/
+.nyc_output/
+test-results/

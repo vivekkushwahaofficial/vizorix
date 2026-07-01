@@ -1,0 +1,95 @@
+# Dependency directories
+node_modules/
+jspm_packages/
+web_runner/
+
+# Build and distribution directories
+dist/
+build/
+out/
+.next/
+.nuxt/
+.cache/
+target/
+bin/
+
+# Temporary and log files
+*.log
+logs/
+*.tmp
+*.temp
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment and sensitive variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env.bak
+.env.*
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*.swo
+.project
+.classpath
+.settings/
+.factorypath
+.metadata/
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+ENV/
+.pytest_cache/
+.tox/
+.coverage
+htmlcov/
+
+# Java/Maven/Gradle artifacts
+.gradle/
+.settings/
+.springBeans
+*.class
+*.war
+*.ear
+*.jar
+.recommenders/
+
+# Testing coverage
+coverage/
+.nyc_output/
+.playwright/
+test-results/
+
+# Infrastructure local state
+.terraform/
+*.tfstate
+*.tfstate.backup
+
+# Docker
+.docker/
