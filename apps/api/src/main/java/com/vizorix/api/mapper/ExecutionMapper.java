@@ -29,7 +29,13 @@ public class ExecutionMapper {
     }
     ExecutionSession session = new ExecutionSession();
     session.setProject(project);
-    session.setStatus(result.succeeded() ? SessionStatus.SUCCESS : SessionStatus.FAILED);
+    if (result.succeeded()) {
+      session.setStatus(SessionStatus.SUCCESS);
+    } else if ("Cancelled by user".equals(result.errorMessage())) {
+      session.setStatus(SessionStatus.CANCELLED);
+    } else {
+      session.setStatus(SessionStatus.FAILED);
+    }
     session.setErrorMessage(result.errorMessage());
     session.setCompileTimeMs(result.compileTimeMs());
     session.setExecutionTimeMs(result.executionTimeMs());

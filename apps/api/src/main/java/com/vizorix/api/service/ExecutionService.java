@@ -253,7 +253,7 @@ public class ExecutionService {
       jdiTracer.cancel();
     }
 
-    session.setStatus(SessionStatus.FAILED);
+    session.setStatus(SessionStatus.CANCELLED);
     session.setErrorMessage("Cancelled by user");
     sessionRepository.save(session);
   }

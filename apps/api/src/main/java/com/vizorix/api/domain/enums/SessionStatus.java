@@ -5,5 +5,6 @@ public enum SessionStatus {
   PENDING,
   RUNNING,
   SUCCESS,
-  FAILED
+  FAILED,
+  CANCELLED
 }

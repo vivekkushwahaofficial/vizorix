@@ -31,7 +31,7 @@ export interface ExecutionStepResponse {
 export interface ExecutionSessionSummary {
   executionId: string;
   totalSteps: number;
-  status: 'PENDING' | 'RUNNING' | 'SUCCESS' | 'FAILED';
+  status: 'PENDING' | 'RUNNING' | 'SUCCESS' | 'FAILED' | 'CANCELLED';
   compileTimeMs: number;
   executionTimeMs: number;
 }
