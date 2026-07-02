@@ -63,6 +63,52 @@ cd vizorix
 
 ---
 
+## Local Development
+
+### Prerequisites
+
+- Java 21+, Maven, PostgreSQL 15+
+- Node.js 20+, npm
+
+### Environment Variables
+
+The API requires the following environment variables. Copy `.env.example` to `.env` at the repository root and fill in your values:
+
+```bash
+# .env (git-ignored)
+DB_URL=jdbc:postgresql://localhost:5432/vizorix
+DB_USERNAME=postgres
+DB_PASSWORD=your_password
+
+# Generate a secure secret (min 32 chars) — required, no default
+JWT_SECRET=your_secret_key_here
+```
+
+Or export them directly in your shell before running:
+
+**Bash / Zsh:**
+```bash
+export JWT_SECRET="your_secret_key_here"
+./mvnw -pl apps/api spring-boot:run -Dspring-boot.run.profiles=local
+```
+
+**PowerShell:**
+```powershell
+$env:JWT_SECRET = "your_secret_key_here"
+./mvnw -pl apps/api spring-boot:run -Dspring-boot.run.profiles=local
+```
+
+> **Note:** Never commit a real secret to the repository. Use your IDE's run configuration environment variables or a local `.env` file (already in `.gitignore`).
+
+### Starting the Frontend
+
+```bash
+npm install
+npm run dev --workspace=apps/web
+```
+
+---
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import AppLayout from '@/layouts/AppLayout';
 import Home from '@/pages/Home';
+import EditorPage from '@/pages/EditorPage';
 
 /**
  * Main application routing configurations.
@@ -12,6 +13,7 @@ export default function App() {
       <Routes>
         <Route element={<AppLayout />}>
           <Route path="/" element={<Home />} />
+          <Route path="/editor" element={<EditorPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
