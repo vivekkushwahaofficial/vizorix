@@ -36,12 +36,16 @@ class PersistenceTests {
 
   @Autowired private VariableSnapshotRepository variableSnapshotRepository;
 
+  private String randomString() {
+    return UUID.randomUUID().toString().substring(0, 8);
+  }
+
   /** Tests user entity save, update, auditing timestamps, and optimistic lock checks. */
   @Test
   void testUserPersistenceAndAuditing() {
     User user = new User();
-    user.setEmail("test@vizorix.com");
-    user.setUsername("testuser");
+    user.setEmail("test-auditing-" + randomString() + "@vizorix.com");
+    user.setUsername("testuser-auditing-" + randomString());
     user.setPasswordHash("hash123");
 
     User savedUser = userRepository.saveAndFlush(user);
@@ -52,7 +56,7 @@ class PersistenceTests {
     assertEquals(0L, savedUser.getVersion());
 
     // Test updating User triggers version and updatedAt update
-    savedUser.setUsername("updateduser");
+    savedUser.setUsername("updateduser-" + randomString());
     User updatedUser = userRepository.saveAndFlush(savedUser);
     assertEquals(1L, updatedUser.getVersion());
     assertTrue(updatedUser.getUpdatedAt().isAfter(updatedUser.getCreatedAt()));
@@ -61,15 +65,16 @@ class PersistenceTests {
   /** Tests that duplicate emails trigger database constraint validation failures. */
   @Test
   void testUniqueConstraintViolation() {
+    String email = "dup-" + randomString() + "@vizorix.com";
     User user1 = new User();
-    user1.setEmail("dup@vizorix.com");
-    user1.setUsername("user1");
+    user1.setEmail(email);
+    user1.setUsername("user1-" + randomString());
     user1.setPasswordHash("hash1");
     userRepository.saveAndFlush(user1);
 
     User user2 = new User();
-    user2.setEmail("dup@vizorix.com"); // Duplicate email
-    user2.setUsername("user2");
+    user2.setEmail(email); // Duplicate email
+    user2.setUsername("user2-" + randomString());
     user2.setPasswordHash("hash2");
 
     assertThrows(
@@ -83,8 +88,8 @@ class PersistenceTests {
   @Test
   void testProjectPersistenceAndRelationalBindings() {
     User user = new User();
-    user.setEmail("projectowner@vizorix.com");
-    user.setUsername("owner");
+    user.setEmail("projectowner-" + randomString() + "@vizorix.com");
+    user.setUsername("owner-" + randomString());
     user.setPasswordHash("hash");
     User savedUser = userRepository.saveAndFlush(user);
 
@@ -104,8 +109,8 @@ class PersistenceTests {
   @Test
   void testCascadeAndOrphansRemoval() {
     User user = new User();
-    user.setEmail("cascade@vizorix.com");
-    user.setUsername("cascadeuser");
+    user.setEmail("cascade-" + randomString() + "@vizorix.com");
+    user.setUsername("cascadeuser-" + randomString());
     user.setPasswordHash("hash");
     User savedUser = userRepository.saveAndFlush(user);
 

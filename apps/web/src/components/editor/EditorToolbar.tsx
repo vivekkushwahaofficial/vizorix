@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Copy, RotateCcw, Settings, Play, ChevronDown } from 'lucide-react';
 import { useEditorState } from '@/hooks/useEditorState';
+import { useExecution } from '@/hooks/useExecution';
 import EditorSettingsPanel from './EditorSettingsPanel';
 
 interface EditorToolbarProps {
   language: string;
   onLanguageChange: (language: string) => void;
+  projectId?: string | null;
 }
 
 const SUPPORTED_LANGUAGES = [
@@ -17,8 +19,9 @@ const SUPPORTED_LANGUAGES = [
  * Top toolbar for the editor surface.
  * Provides: language selector, Run (placeholder for M10), Copy, Reset, and Settings toggle.
  */
-export default function EditorToolbar({ language, onLanguageChange }: EditorToolbarProps) {
+export default function EditorToolbar({ language, onLanguageChange, projectId }: EditorToolbarProps) {
   const { code, isDirty, resetCode } = useEditorState();
+  const { isExecuting, startExecution } = useExecution();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
@@ -40,10 +43,13 @@ export default function EditorToolbar({ language, onLanguageChange }: EditorTool
 
   /**
    * Entry point for Milestone 10 execution engine binding.
-   * Replace this body with the execution API call once the backend endpoint is ready.
    */
   const handleRun = () => {
-    // TODO(M10): POST /api/execute with { code, language } → receive execution steps
+    if (!projectId) {
+      alert('Please select or create a project on the dashboard first to execute code.');
+      return;
+    }
+    startExecution(code, projectId);
   };
 
   const selectedLang = SUPPORTED_LANGUAGES.find((l) => l.value === language) ?? SUPPORTED_LANGUAGES[0];
@@ -109,22 +115,21 @@ export default function EditorToolbar({ language, onLanguageChange }: EditorTool
 
         {/* Right: action buttons */}
         <div className="flex items-center gap-1.5">
-          {/* Run — placeholder for M10 execution engine */}
+          {/* Run — wires to execution engine */}
           <ToolbarButton
             id="editor-run-btn"
             onClick={handleRun}
-            title="Run code (coming in M10)"
-            disabled
+            title={projectId ? "Run code" : "Select a project to run"}
+            disabled={isExecuting || !projectId}
             className="gap-1.5 px-3"
             style={{
-              background: 'var(--primary)',
-              color: 'var(--primary-foreground)',
-              opacity: 0.5,
-              cursor: 'not-allowed',
+              background: projectId ? 'var(--primary)' : 'var(--muted)',
+              color: projectId ? 'var(--primary-foreground)' : 'var(--muted-foreground)',
+              opacity: isExecuting || !projectId ? 0.6 : 1,
             }}
           >
-            <Play size={13} />
-            <span className="text-xs font-semibold">Run</span>
+            <Play size={13} className={isExecuting ? "animate-pulse" : ""} />
+            <span className="text-xs font-semibold">{isExecuting ? 'Running...' : 'Run'}</span>
           </ToolbarButton>
 
           <div className="w-px h-5 mx-1" style={{ background: 'var(--border)' }} />

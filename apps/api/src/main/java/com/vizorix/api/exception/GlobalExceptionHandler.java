@@ -115,6 +115,38 @@ public class GlobalExceptionHandler {
   }
 
   /**
+   * Intercepts CompilationException during Java code compile checks.
+   *
+   * @param ex compilation failure exception
+   * @param request servlet request context
+   * @return structured compiler diagnostics error response
+   */
+  @ExceptionHandler(CompilationException.class)
+  public ResponseEntity<ErrorResponse> handleCompilation(
+      CompilationException ex, HttpServletRequest request) {
+    String detail = String.join("; ", ex.getDiagnostics());
+    return buildResponse(
+        HttpStatus.BAD_REQUEST,
+        "COMPILATION_FAILED",
+        ex.getMessage() + (detail.isEmpty() ? "" : ": " + detail),
+        request);
+  }
+
+  /**
+   * Intercepts general execution engine debugger trace failures.
+   *
+   * @param ex execution engine exception
+   * @param request servlet request context
+   * @return standard error response
+   */
+  @ExceptionHandler(ExecutionEngineException.class)
+  public ResponseEntity<ErrorResponse> handleExecutionEngine(
+      ExecutionEngineException ex, HttpServletRequest request) {
+    return buildResponse(
+        HttpStatus.INTERNAL_SERVER_ERROR, "EXECUTION_FAILED", ex.getMessage(), request);
+  }
+
+  /**
    * Fallback for general unhandled runtime exceptions.
    *
    * @param ex the general runtime exception

@@ -1,4 +1,4 @@
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useEffect } from 'react';
 import MonacoReact, { type Monaco, type OnMount } from '@monaco-editor/react';
 import { useTheme } from '@/hooks/useTheme';
 import { useEditorSettings } from '@/hooks/useEditorSettings';
@@ -6,6 +6,7 @@ import { useEditorState } from '@/hooks/useEditorState';
 
 interface MonacoEditorProps {
   language?: string;
+  highlightLine?: number;
 }
 
 /**
@@ -16,12 +17,14 @@ interface MonacoEditorProps {
  * - Cursor position is written back to the EditorState store on every change.
  * - Shows a styled skeleton loader while Monaco workers initialise.
  */
-export default function MonacoEditor({ language = 'java' }: MonacoEditorProps) {
+export default function MonacoEditor({ language = 'java', highlightLine }: MonacoEditorProps) {
   const { isDark } = useTheme();
   const [settings] = useEditorSettings();
   const { code, setCode, updateCursor } = useEditorState();
 
   const monacoRef = useRef<Monaco | null>(null);
+  const editorRef = useRef<any>(null);
+  const decorationsRef = useRef<string[]>([]);
 
   const handleBeforeMount = useCallback((monaco: Monaco) => {
     monacoRef.current = monaco;
@@ -83,7 +86,9 @@ export default function MonacoEditor({ language = 'java' }: MonacoEditorProps) {
   }, []);
 
   const handleMount: OnMount = useCallback(
-    (editor) => {
+    (editor, monaco) => {
+      editorRef.current = editor;
+      monacoRef.current = monaco;
       // Sync cursor position to store
       editor.onDidChangeCursorPosition((e) => {
         updateCursor(e.position.lineNumber, e.position.column);
@@ -91,6 +96,28 @@ export default function MonacoEditor({ language = 'java' }: MonacoEditorProps) {
     },
     [updateCursor],
   );
+
+  useEffect(() => {
+    const editor = editorRef.current;
+    const monaco = monacoRef.current;
+    if (!editor || !monaco) return;
+
+    if (highlightLine && highlightLine > 0) {
+      decorationsRef.current = editor.deltaDecorations(decorationsRef.current, [
+        {
+          range: new monaco.Range(highlightLine, 1, highlightLine, 1),
+          options: {
+            isWholeLine: true,
+            className: 'vizorix-active-line',
+            glyphMarginClassName: 'vizorix-active-line-glyph',
+          },
+        },
+      ]);
+      editor.revealLineInCenterIfOutsideViewport(highlightLine);
+    } else {
+      decorationsRef.current = editor.deltaDecorations(decorationsRef.current, []);
+    }
+  }, [highlightLine]);
 
   return (
     <div className="relative flex-1 overflow-hidden" style={{ minHeight: 0 }}>

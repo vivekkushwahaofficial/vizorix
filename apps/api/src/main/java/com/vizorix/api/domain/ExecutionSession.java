@@ -31,6 +31,24 @@ public class ExecutionSession extends BaseEntity {
   @Column(name = "error_message", columnDefinition = "TEXT")
   private String errorMessage;
 
+  @Column(name = "compile_time_ms")
+  private Long compileTimeMs;
+
+  @Column(name = "execution_time_ms")
+  private Long executionTimeMs;
+
+  @Column(name = "total_steps")
+  private Integer totalSteps;
+
+  @Column(name = "total_variables")
+  private Integer totalVariables;
+
+  @Column(name = "total_console_lines")
+  private Integer totalConsoleLines;
+
+  @Column(name = "max_stack_depth")
+  private Integer maxStackDepth;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "project_id", nullable = false)
   private Project project;
